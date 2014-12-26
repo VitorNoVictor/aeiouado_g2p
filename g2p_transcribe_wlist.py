@@ -26,12 +26,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Script to test the speller over a text.')
     parser.add_argument('g2p_model_dir', help='G2P model dir')
     parser.add_argument('nlpnet_model_dir', help='nlpnet POS model dir')
+    parser.add_argument('dic_file', help='dictionary with exceptions')
     parser.add_argument('conv', help='phone convention: "ipa", "xsampa", "htk" or "aeiouado"')
     parser.add_argument('wlist_input', help='word list to transcribe')
     parser.add_argument('wlist_output', help='file to save the trascribed word list')
     args = parser.parse_args()
 
-    g2p = AeiouadoG2P(args.g2p_model_dir, args.nlpnet_model_dir)
+    g2p = AeiouadoG2P(args.g2p_model_dir, args.nlpnet_model_dir, args.dic_file)
     
     word_trans = []
     with open(args.wlist_input) as word_list:

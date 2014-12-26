@@ -107,6 +107,7 @@ florida,florido.V:K;FLÓ-@ŔÍ-D6
 florida,florido.A:fs;FLÔ-@ŔÍ-D6
 florida,florido.V:K;FLÔ-@ŔÍ-D6
 rastro,rastro.N:ms;@HÁS-TŔU
+abacaxi,abacaxi.N:ms;Á-BÁ-KÁ-@XÍ
 caótica,caótico.A:fs;KÁ-@Ó-7Í-K6
 engordam,engordar.V:P3p;Ẽ-@GÓR-DÃŴ
 broto,broto.V:P1s;@BŔÔ-TU

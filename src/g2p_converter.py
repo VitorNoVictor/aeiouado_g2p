@@ -2,13 +2,14 @@
 
 from __future__ import unicode_literals
 from extract_features import ExtractFeatures
+from delaf import DelafEntry
 import argparse
 from sklearn.externals import joblib
 import re
 
 class AeiouadoG2P(object):
 
-    def __init__(self, g2p_dir, nlpnet_model_dir=''):
+    def __init__(self, g2p_dir, nlpnet_model_dir='', dic_file=''):
 
         self.clf_delaf = joblib.load('%s/g2p_clf_delaf.pkl' % g2p_dir)
         self.vectorizer_delaf = joblib.load('%s/vectorizer_delaf.pkl' % g2p_dir)
@@ -18,9 +19,29 @@ class AeiouadoG2P(object):
         self.vectorizer_simple = joblib.load('%s/vectorizer_simple.pkl' % g2p_dir)
         self.lab_encoder_simple = joblib.load('%s/lab_encoder_simple.pkl' % g2p_dir)
         
-        self.dic = []
         self.feat_extractor = ExtractFeatures(nlpnet_model_dir)
-        
+
+        # Load and process the exception dictionary
+        # Transcriptions stored in this dictionary are assumed to be right
+        # They are returned instead of being transcribed online
+        self.dic = {}
+        if dic_file != '':
+            with open(dic_file) as dic:
+                for line in dic:
+
+                    # Separate the entry and the transcription
+                    entry, trans = line.decode('utf-8').rsplit(';')
+
+                    entry = entry.strip()
+                    trans = trans.strip()
+
+                    # Create a DelafEntry object, in order to be able to retrieve the word and the gramm info
+                    delaf_entry = DelafEntry(entry)
+                    word = delaf_entry.getWord()
+                    pos = delaf_entry.getPos()
+                    self.dic[word] = {}
+                    self.dic[word][pos] = trans
+
 
     def _conv_simple(self, word):
         '''
@@ -182,7 +203,9 @@ class AeiouadoG2P(object):
         
         if dic:
             if word in self.dic:
-                trans = self.dic[word][0]
+                if len(self.dic[word]) == 1:
+                    for pos in self.dic[word]:
+                        trans = self.dic[word][pos]
             else:
                 trans = self._conv_simple(word)
         else:
@@ -208,9 +231,13 @@ class AeiouadoG2P(object):
     
         word = word.lower()
         
+        # Check if word is in dictionary
+        # If positive, return the first transcription it finds
         if dic:
             if word in self.dic:
-                trans = self.dic[word][0]
+                if len(self.dic[word]) == 1:
+                    for pos in self.dic[word]:
+                        return self.dic[word][pos]
             else:
                 trans = self._conv_delaf(word)
         else:
